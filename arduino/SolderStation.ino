@@ -1,3 +1,4 @@
+//Code modified and adapted from:
 //*******************************//
 // Soldering Station
 // Matthias Wagner
@@ -5,26 +6,16 @@
 // Get.A.Soldering.Station@gmail.com
 //*******************************//
 
-
-#include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_QDTech.h> // Hardware-specific library
-#include <SPI.h>
-
-#include "iron.h"
-#include "stationLOGO.h"
-
-
-#define VERSION "1.5"		//Version der Steuerung
-#define INTRO
-
-#define sclk 	13		// Don't change
-#define mosi 	11		// Don't change
-#define cs_tft	10		// 
-
+/*Legacy intro code
+//#define VERSION "1.5"		//Version der Steuerung
+//#define INTRO
+///#define sclk 	13		// Don't change
+//#define mosi 	11		// Don't change
+//#define cs_tft	10		// 
 
 //V1.5
-#define dc   	9		// 8
-#define rst  	12		// 9 
+//#define dc   	9		// 8
+//#define rst  	12		// 9 
 
 /*
 //V1.4
@@ -32,27 +23,51 @@
 #define rst  	9
 */
 
-#define STANDBYin A4
-#define POTI   	A5
-#define TEMPin 	A7
+///1.6
+//#define STANDBYin A4
+//#define POTI   	A5
+//#define TEMPin 	A7
+
+#define VERSION "Rev.16"
+#include <Adafruit_GFX.h>    // Core graphics library
+#include <Adafruit_QDTech.h> // Hardware-specific library
+#include <SPI.h>
+#include "iron.h"
+#include "stationLOGO.h"
+
+/********************************
+* Pin Definitions				*
+*********************************/
+#define INTRO
 #define PWMpin 	3
-#define BLpin		5
+#define BLpin	5
+#define dc   	9
+#define cs_tft	10		// 
+#define mosi 	11		// Don't change
+#define rst  	12		
+#define sclk 	13		// Don't change
+#define STANDBYin A0
+#define POTI A1
+#define TEMPin A2
 
-#define CNTRL_GAIN 10
+/*
+* 
+*/
 
+//#define ADC_TO_TEMP_GAIN 	0.415  //V1.6
+#define ADC_TO_TEMP_GAIN 	0.53 //Compared to original Weller station
+#define ADC_TO_TEMP_OFFSET 	25.0
+#define CNTRL_GAIN 			10
 #define DELAY_MAIN_LOOP 	10
 #define DELAY_MEASURE 		50
-//#define ADC_TO_TEMP_GAIN 	0.415
-#define ADC_TO_TEMP_GAIN 	0.53 //Mit original Weller Station verglichen
-#define ADC_TO_TEMP_OFFSET 25.0
-#define STANDBY_TEMP			175
 
-#define OVER_SHOT 			2
-#define MAX_PWM_LOW			180
-#define MAX_PWM_HI			210		//254
-#define MAX_POTI				400		//400Grad C
+#define MAX_PWM_LOW		180
+#define MAX_PWM_HI		210		//254
+#define MAX_POTI		400		//400Grad C
+#define OVER_SHOT 		2
 
-#define PWM_DIV 1024						//default: 64   31250/64 = 2ms
+#define PWM_DIV 		1024	//default: 64   31250/64 = 2ms
+#define STANDBY_TEMP	175
 
 Adafruit_QDTech tft = Adafruit_QDTech(cs_tft, dc, rst);  // Invoke custom library
 
@@ -74,17 +89,13 @@ void setup(void) {
 	
 	tft.init();
 	SPI.setClockDivider(SPI_CLOCK_DIV4);  // 4MHz
-	
-	
+		
 	tft.setRotation(0);	// 0 - Portrait, 1 - Lanscape
 	tft.fillScreen(QDTech_BLACK);
 	tft.setTextWrap(true);
 	
-	
-	
 	//Print station Logo
 	tft.drawBitmap(2,1,stationLOGO1,124,47,QDTech_GREY);
-	
 	tft.drawBitmap(3,3,stationLOGO1,124,47,QDTech_YELLOW);		
 	tft.drawBitmap(3,3,stationLOGO2,124,47,Color565(254,147,52));	
 	tft.drawBitmap(3,3,stationLOGO3,124,47,Color565(255,78,0));
@@ -175,7 +186,7 @@ void loop() {
 	
 	int soll_temp_tmp = soll_temp;
 	
-	if (digitalRead(STANDBYin) == false)
+	f (digitalRead(STANDBYin) == false)
 		standby_act = true;
 	else
 		standby_act = false;
@@ -230,8 +241,7 @@ int getTemperature()
 
 
 void writeHEATING(int tempSOLL, int tempVAL, int pwmVAL){
-	static int d_tempSOLL = 2;		//Tiefpass für Anzeige (Poti zittern)
-
+	static int d_tempSOLL = 2;		//Tiefpass für Anzeige (Poti zittern) Low pass for display (poti tremble)
 	static int tempSOLL_OLD = 	10;
 	static int tempVAL_OLD	= 	10;
 	static int pwmVAL_OLD	= 	10;
