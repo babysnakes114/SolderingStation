@@ -24,9 +24,16 @@
 */
 
 ///1.6
-//#define STANDBYin A4
-//#define POTI   	A5
-//#define TEMPin 	A7
+// #define PWMpin 	3
+// #define BLpin	5
+// #define dc   	9
+// #define cs_tft	10		// 
+// #define mosi 	11		// Don't change
+// #define rst  	12		
+// #define sclk 	13		// Don't change
+// #define STANDBYin A4
+// #define POTI   	A5
+// #define TEMPin 	A7
 
 #define VERSION "Rev.16"
 #include <Adafruit_GFX.h>    // Core graphics library
@@ -40,11 +47,12 @@
 *********************************/
 #define INTRO
 #define PWMpin 	3
-#define BLpin	5
-#define dc   	9
-#define cs_tft	10		// 
+#define fan		6
+#define spare	7
+#define dc   	8
+#define cs_tft	9		// 
+#define BLpin	10
 #define mosi 	11		// Don't change
-#define rst  	12		
 #define sclk 	13		// Don't change
 #define STANDBYin A0
 #define POTI A1
